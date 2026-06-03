@@ -1,0 +1,23 @@
+name: Build Kernel
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build kernel via HF Jobs
+        uses: ./action
+        with:
+          token: ${{ secrets.HF_TOKEN }}
+          namespace: drbh
+          # image: uses default nix image
+          script: |
+            nix run github:huggingface/kernels#kernel-builder -- init --name drbh/test-kernel --backends cuda
+            cd test-kernel
+            git init && git add -A && git commit -m init
+            nix run github:huggingface/kernels#kernel-builder -- build

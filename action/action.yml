@@ -1,0 +1,24 @@
+name: 'HF Jobs Run'
+description: 'Run a command on HF Jobs infrastructure and stream logs'
+inputs:
+  image:
+    description: 'Docker image (with optional @sha256 digest)'
+    default: 'drbh/hf-jobs-nix-instance@sha256:b7eb0ea28ca765808d14e3973abe5671d39ed8791146754a2e11274358715eed'
+  script:
+    description: 'Shell script to run inside the container'
+    required: true
+  token:
+    description: 'HF API token with job.write permission'
+    required: true
+  namespace:
+    description: 'HF namespace (defaults to token owner)'
+    required: true
+  flavor:
+    description: 'Hardware flavor (e.g. cpu-basic, cpu-upgrade, cpu-xl)'
+    default: 'cpu-upgrade'
+  timeout:
+    description: 'Max seconds to wait for job completion'
+    default: '1200'
+runs:
+  using: 'node20'
+  main: 'index.js'
