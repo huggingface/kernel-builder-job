@@ -21,3 +21,5 @@ jobs:
             cd test-kernel
             git init && git add -A && git commit -m init
             kernel-builder build
+        # WARNING: This step passes a secret to a third-party action pinned to @main.
+        # Consider pinning to a specific commit SHA and verifying the action source code.
