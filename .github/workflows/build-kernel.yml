@@ -17,7 +17,7 @@ jobs:
           namespace: drbh
           # image: uses default nix image
           script: |
-            nix run github:huggingface/kernels#kernel-builder -- init --name drbh/test-kernel --backends cuda
+            kernel-builder init --name drbh/test-kernel --backends cuda
             cd test-kernel
             git init && git add -A && git commit -m init
-            nix run github:huggingface/kernels#kernel-builder -- build
+            kernel-builder build
