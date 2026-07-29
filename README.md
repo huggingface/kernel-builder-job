@@ -10,11 +10,16 @@ GitHub Action to build kernels on HF Jobs infrastructure.
     token: ${{ secrets.HF_TOKEN }}
     namespace: your-username
     script: |
-      nix run github:huggingface/kernels#kernel-builder -- init --name your-username/my-kernel --backends cuda
+      kernel-builder init --name your-username/my-kernel --backends cuda
       cd my-kernel
       git init && git add -A && git commit -m init
-      nix run github:huggingface/kernels#kernel-builder -- build
+      kernel-builder build
 ```
+
+The default image ships `kernel-builder` on `PATH`. If you override `image` with
+one that only has Nix, install the CLI first
+(`nix profile install --accept-flake-config github:huggingface/kernels#kernel-builder`)
+or call it ad-hoc with `nix run github:huggingface/kernels#kernel-builder -- ...`.
 
 ## Inputs
 
@@ -22,7 +27,7 @@ GitHub Action to build kernels on HF Jobs infrastructure.
 | ----------- | -------- | ------------- | ----------------------------------------------- |
 | `token`     | yes      |               | HF API token with `job.write` permission        |
 | `namespace` | yes      |               | HF namespace (username or org)                  |
-| `image`     | no       | `drbh/hf-jobs-nix-instance@sha256:...` | Docker image with nix + cachix |
+| `image`     | no       | `drbh/hf-jobs-nix-instance@sha256:...` | Docker image with nix + `kernel-builder` |
 | `script`    | yes      |               | Shell script to run in the container            |
 | `flavor`    | no       | `cpu-upgrade` | Hardware flavor (e.g. `t4-small`, `a10g-large`) |
 | `timeout`   | no       | `1200`        | Max seconds to wait for completion              |

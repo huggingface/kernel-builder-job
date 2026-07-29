@@ -44,9 +44,13 @@ RUN echo "experimental-features = nix-command flakes" >> /etc/nix/nix.conf \
     && nix profile install nixpkgs#cachix nixpkgs#git nixpkgs#git-lfs nixpkgs#jq \
     && cachix use huggingface
 
-# Pre-fetch kernel-builder flake metadata (deps fetched from cachix at runtime)
-ARG KERNEL_BUILDER_REF=github:huggingface/kernel-builder
-RUN nix flake prefetch "${KERNEL_BUILDER_REF}"
+# Install kernel-builder so that jobs can call it as a CLI (`kernel-builder
+# build-and-upload ...`) instead of `nix run`. This also pre-fetches the flake,
+# so nothing has to be resolved at job start-up.
+ARG KERNEL_BUILDER_REF=github:huggingface/kernels
+RUN nix profile install --accept-flake-config "${KERNEL_BUILDER_REF}#kernel-builder" \
+    && ln -s /root/.nix-profile/bin/kernel-builder /usr/local/bin/kernel-builder \
+    && kernel-builder --version
 
 # Remove build-time sandbox overrides so runtime gets sandbox = true (required by kernel-builder)
 RUN sed -i '/^sandbox = false$/d; /^filter-syscalls = false$/d' /etc/nix/nix.conf

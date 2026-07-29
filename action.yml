@@ -2,7 +2,7 @@ name: 'HF Jobs Run'
 description: 'Run a command on HF Jobs infrastructure and stream logs'
 inputs:
   image:
-    description: 'Docker image (with optional @sha256 digest)'
+    description: 'Docker image (with optional @sha256 digest). The default ships nix + kernel-builder on PATH.'
     default: 'drbh/hf-jobs-nix-instance@sha256:b7eb0ea28ca765808d14e3973abe5671d39ed8791146754a2e11274358715eed'
   script:
     description: 'Shell script to run inside the container'
