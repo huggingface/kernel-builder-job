@@ -1,5 +1,8 @@
 FROM registry.access.redhat.com/ubi8/ubi:latest
 
+# Link the GHCR package to this repo
+LABEL org.opencontainers.image.source="https://github.com/huggingface/kernel-builder-job"
+
 # Install dependencies needed for Nix installer
 RUN dnf install -y \
         curl \
