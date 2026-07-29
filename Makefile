@@ -1,4 +1,4 @@
-IMAGE = drbh/hf-jobs-nix-instance
+IMAGE = ghcr.io/huggingface/kernel-builder-job
 TAG = latest
 
 .PHONY: build push

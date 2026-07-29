@@ -1,0 +1,66 @@
+name: Build image
+
+on:
+  pull_request:
+    paths:
+      - docker/**
+      - .github/workflows/build-image.yml
+  push:
+    branches: [main]
+    paths:
+      - docker/**
+      - .github/workflows/build-image.yml
+  workflow_dispatch:
+
+env:
+  IMAGE: ghcr.io/${{ github.repository }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # PRs only build (the `kernel-builder --version` check in the Dockerfile
+      # validates the image); pushes to main also publish to GHCR.
+      - name: Build and push
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: docker
+          platforms: linux/amd64
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ env.IMAGE }}:latest
+
+      - name: Pin new digest in action.yml
+        if: github.event_name != 'pull_request'
+        run: |
+          sed -i -E "s#(default: ')[^']+@sha256:[a-f0-9]{64}(')#\1${IMAGE}@${{ steps.build.outputs.digest }}\2#" action.yml
+
+      - name: Open digest-bump PR
+        if: github.event_name != 'pull_request'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: bump-image-digest
+          title: 'chore: bump default image digest'
+          commit-message: |
+            chore: bump default image to ${{ env.IMAGE }}@${{ steps.build.outputs.digest }}
+          body: |
+            Automated bump of the pinned default `image` in `action.yml` after a
+            rebuild of `docker/Dockerfile` was pushed to GHCR.
+
+            Digest: `${{ steps.build.outputs.digest }}`
