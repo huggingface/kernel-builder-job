@@ -27,7 +27,7 @@ or call it ad-hoc with `nix run github:huggingface/kernels#kernel-builder -- ...
 | ----------- | -------- | ------------- | ----------------------------------------------- |
 | `token`     | yes      |               | HF API token with `job.write` permission        |
 | `namespace` | yes      |               | HF namespace (username or org)                  |
-| `image`     | no       | `ghcr.io/huggingface/kernel-builder-job@sha256:...` | Docker image with nix + `kernel-builder` |
+| `image`     | no       | `ghcr.io/huggingface/kernel-builder-job:latest` | Docker image with nix + `kernel-builder` |
 | `script`    | yes      |               | Shell script to run in the container            |
 | `flavor`    | no       | `cpu-upgrade` | Hardware flavor (e.g. `t4-small`, `a10g-large`) |
 | `timeout`   | no       | `1200`        | Max seconds to wait for completion              |
@@ -42,6 +42,8 @@ or call it ad-hoc with `nix run github:huggingface/kernels#kernel-builder -- ...
 ## Image builds
 
 Changes under `docker/` are built by CI (`.github/workflows/build-image.yml`):
-pull requests get a build-only validation, and pushes to `main` publish the
-image to `ghcr.io/huggingface/kernel-builder-job` and open an automated PR
-bumping the pinned digest in `action.yml`.
+pull requests get a build-only validation, and pushes to `main` publish
+`ghcr.io/huggingface/kernel-builder-job:latest`, which the action uses by
+default. Each push is also tagged `sha-<commit>` — an immutable reference for
+pinning a known-good image via the `image` input or rolling back a bad push
+(retag it as `latest`).
