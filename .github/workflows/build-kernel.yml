@@ -14,7 +14,7 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       - name: Build kernel via HF Jobs
-        uses: huggingface/kernel-builder-job@main
+        uses: huggingface/kernel-builder-job@aef732905997789860660d690cee5d356cc25c45  # main
         with:
           token: ${{ secrets.HF_TOKEN }}
           namespace: drbh
